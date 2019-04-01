@@ -9,17 +9,19 @@ from luma.core.legacy import text, show_message
 from luma.core.render import canvas
 gpio.setmode(gpio.BOARD)
 
+serial = spi(port=0, device=0, gpio=noop())
+device = max7219(serial, height=8, width=8)
 
 pins = [8,10,12,16] #Puldi kontroll pinnid
 def controller(gpio):
   global directions
-  if(gpio == 14):   #alla
+  if(gpio == 8):   #alla
    directions = [1,0]
-  elif(gpio == 15): #ülesse
+  elif(gpio == 10): #ülesse
    directions = [0,-1]
-  elif(gpio == 18): #paremale
+  elif(gpio == 12): #paremale
    directions = [0,1]
-  elif(gpio == 23): #vasakule
+  elif(gpio == 16): #vasakule
    directions = [-1,0]
   
   
@@ -27,14 +29,10 @@ for index in pins:
    gpio.setup(index,gpio.IN,pull_up_down=gpio.PUD_DOWN) #muudab kontrolleri pinnid sisendiks
    gpio.add_event_detect(index, gpio.RISING, callback=controller) #Käivitab funktsiooni kui on kontrolleri pinnides voolu muutus
 
-serial = spi(port=0, device=0, gpio=noop())
-device = max7219(serial, height=8, width=8) #LED-maatriksi suurus
 
-
-def gameover():
-  show_message(device, "LABI", fill="red", scroll_delay=0.5)
+def gameOver():
   points = str(len(snake)-1)
-  show_message(device,"Kokku punkte: "+ points, fill="red", scroll_delay=0.5)
+  show_message(device, points, fill="red", scroll_delay=0.5)
   
   startPoint()
   
@@ -44,12 +42,15 @@ startPoint()
 def foodSpawn():
   global food, snake
   snakeFood = False
+  x = randint(0,width)
+  y = randint(0, height)
   while snakeFood == False:
+    food = [x, y]
     snakeFood = True
-    food = [randint(0,width),randint(0,height)]
     for possision in snake:
       if(possision == food):
         foodSnake = False
+  
   
   def startPoint():
   global snake, directions, food
@@ -62,8 +63,7 @@ def foodSpawn():
   
 while True:
   Pause = False
-  newSnake = [snake[0][0]+directions[0],
-              snake[0][1]+directions[1]]
+  newSnake = [snake[0][0]+directions[0], snake[0][1]+directions[1]]
   for index in snake:
     if(index == newSnake):
       gameOver()
@@ -77,14 +77,16 @@ while True:
      snake.pop()
   snake.insert(0,newSnake)
 
-  if(snake[0][0] > width or snake [0][1] > height
-    or snake[0][0] < 0 or snake[0][1] < 0 ):
+  if(snake[0][0] > width or snake[0][1]):
+    gameOver()
+    pass
+  elif(height or snake[0][0] < 0 or snake[0][1] < 0 ):
     gameOver()
     pass
 
 
   device.clear()
-
+  
    with canvas(device) as draw:
       for index in snake:
         dither=True
