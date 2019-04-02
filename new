@@ -12,22 +12,49 @@ gpio.setmode(gpio.BOARD)
 serial = spi(port=0, device=0, gpio=noop())
 device = max7219(serial, height=8, width=8)
 
-for index in pins:
-   gpio.setup(index,gpio.IN,pull_up_down=gpio.PUD_DOWN)
-   gpio.add_event_detect(index, gpio.RISING, callback=controller)
-
-  
-pins = [8,10,12,16] #Puldi kontroll pinnid
-def controller(gpio):
+def down(gpio):
   global directions
-  if(gpio == 8):   #alla
-   directions = [1,0]
-  elif(gpio == 10): #ülesse
-   directions = [0,-1]
-  elif(gpio == 12): #paremale
-   directions = [0,1]
-  elif(gpio == 16): #vasakule
-   directions = [-1,0]
+  directions = [1,0] #alla
+  
+  
+def up(gpio):
+  global directions
+  directions = [0,-1]#ülesse
+  
+  
+def felt(gpio):
+  global directions
+  directions = [-1,0]#vasakule
+  
+  
+def right(gpio):
+  global directions
+  directions = [0,1]#paremale
+  
+  
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
+gpio.setup(8, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+gpio.add_event_detect(8, gpio.RISING, clallback=down)
+
+
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
+gpio.setup(10, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+gpio.add_event_detect(10, gpio.RISING, clallback=up)
+
+
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
+gpio.setup(12, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+gpio.add_event_detect(12, gpio.RISING, clallback=paremale)
+
+
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
+gpio.setup(16, gpio.IN, pull_up_down=gpio.PUD_DOWN)
+gpio.add_event_detect(16, gpio.RISING, clallback=vasakule)
+
   
   
  def startPoint():
@@ -41,7 +68,7 @@ def controller(gpio):
 
 def gameOver():
   points = str(len(snake)-1)
-  show_message(device, "punktid: " + points, fill="red", scroll_delay=0.5)
+  show_message(device, "POINTS: " + points, fill="red", scroll_delay=0.5)
   
   startPoint()
   
@@ -63,19 +90,19 @@ def foodSpawn():
   
 while True:
   Pause = False
-  newSnake = [snake[0][0]+directions[0], snake[0][1]+directions[1]]
+  snakeNew = [snake[0][0]+directions[0], snake[0][1]+directions[1]]
   for index in snake:
-    if(index == newSnake):
+    if(index == snakeNew):
       gameOver()
       pass
 
-  if(newSnake == food):
+  if(snakeNew == food):
      foodSpawn()
      Pause = True
 
   else:
      snake.pop()
-  snake.insert(0,newSnake)
+  snake.insert(0,snakeNew)
 
   if(snake[0][0] > width or snake[0][1]):
     gameOver()
@@ -92,7 +119,7 @@ while True:
         draw.point(index, fill ="red")
 
   if(Pause == False):
-    newLength = (len(snake)-1)*0.1
-    time.sleep(0.3-newLength)
+    lengthNew = (len(snake)-1)*0.1
+    time.sleep(0.3-lengthNew)
   else:
     time.sleep(0.3)
