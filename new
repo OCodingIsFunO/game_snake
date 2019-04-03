@@ -9,117 +9,111 @@ from luma.core.legacy import text, show_message
 from luma.core.render import canvas
 gpio.setmode(gpio.BOARD)
 
-serial = spi(port=0, device=0, gpio=noop())
-device = max7219(serial, height=8, width=8)
+serial = spi(port=0, device=0, gpio=noop()) #Määratakse ära SPI port
+device = max7219(serial, height=8, width=8) #Määratakse ära LED-maatriksi suurus
 
-def down(gpio):
-  global directions
-  directions = [1,0] #alla
+def down(gpio): #Funktsioon mida kasutatakse kui on vajutatud kontrolleril nuppuu, mis paneb ussi liikuma ülesse
+  global directions #globaalne muutja directions
+  directions = [1,0] #muutja directon kordinaadid muutuvad
   
   
-def up(gpio):
-  global directions
-  directions = [0,-1] #ülesse
+def up(gpio): #Funktsioon mida kasutatakse kui on vajutatud kontrolleril nuppu, mis paneb ussi liikuma ülesse
+  global directions #globaalne muutja directions
+  directions = [0,-1]  #muutja directon kordinaadid muutuvad
   
   
-def left(gpio):
-  global directions
-  directions = [-1,0] #vasakule
+def left(gpio): #Funktsioon mida kasutatakse kui on vajutatud kontrolleril nuppu, mis paneb ussi liikuma vasakule
+  global directions #globaalne muutja directions
+  directions = [-1,0]  #muutja directon kordinaadid muutuvad
   
   
-def right(gpio):
-  global directions
-  directions = [0,1] #paremale
+def right(gpio): #Funktsioon mida kasutatakse kui on vajutatud kontrolleril nuppu, mis paneb ussi liikuma paremale
+  global directions #globaalne muutja directions
+  directions = [0,1] #muutja directon kordinaadid muutuvad
+
+
+gpio.setwarnings(False)  #lülitab välja hoiatused pinnil
+gpio.setup(8, gpio.IN, pull_up_down=gpio.PUD_DOWN) #Muudab pinni sisend pinniks
+gpio.add_event_detect(8, gpio.RISING, clallback=down) #Kui pinn saab signaali siis käivitab funktsiooni alla
+
+
+gpio.setwarnings(False) #lülitab välja hoiatused pinnil
+gpio.setup(10, gpio.IN, pull_up_down=gpio.PUD_DOWN) #Muudab pinni sisend pinniks
+gpio.add_event_detect(10, gpio.RISING, clallback=up) #Kui pinn saab signaali siis käivitab funktsiooni alla
+ 
+
+gpio.setwarnings(False) #lülitab välja hoiatused pinnil
+gpio.setup(12, gpio.IN, pull_up_down=gpio.PUD_DOWN) #Muudab pinni sisend pinniks
+gpio.add_event_detect(12, gpio.RISING, clallback=right) #Kui pinn saab signaali siis käivitab funktsiooni alla
+
+
+gpio.setwarnings(False) #lülitab välja hoiatused pinnil
+gpio.setup(16, gpio.IN, pull_up_down=gpio.PUD_DOWN) #Muudab pinni sisend pinniks
+gpio.add_event_detect(16, gpio.RISING, clallback=left) #Kui pinn saab signaali siis käivitab funktsiooni alla
+
+
+def foodSpawn(): #funktsioon foodSpawn
+  global food, snake #Võtab kasutusele globaalsed muutujad
+  snakeFood = False #muutja snakeFood on väär
+  x = randint(0, width) #kordinaat y
+  y = randint(0, height) #kordinaat x
+  while snakeFood == False: #loop mis kestab nii kaua kui muutja snakeFood on väär
+    food = [x, y] #Toidu kordinaadid
+    snakeFood = True #Muudab muutuja snakeFood tõeseks
+    for possision in snake: #Võtab iga ussi osa positsiooni eraldi
+      if(possision == food): #Võrdleb kas ussi osa positsioon on sama mis toidu oma
+        foodSnake = False #Kui ussi osa positsioon on sama mis toidu oma siis muudab muutja foodSnake vääraks
   
   
-gpio.setwarnings(False)
-gpio.setmode(gpio.BOARD)
-gpio.setup(8, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(8, gpio.RISING, clallback=down)
+def startPlace(): #Tehakse funktsioon nimega startPlace
+  global snake, directions, food #Võetakse kasutusele globaalsed muutujad 
+  snake = [4,4]  #ussi alustus kordinaadid
+  directions = [0,0] #ussi liikumis suund (hetkel ei liigu)
+  while directions == [0,0]: #while loop kus loop kestab kuni ussile on antud käsk liikuda
+    show_message(device, "START", fill="red", scroll_delay=0.1 #LED-maatriksile tuleb tekst START
+  foodSpawn() #Käivitab funktsiooni foodSpawn
 
 
-gpio.setwarnings(False)
-gpio.setmode(gpio.BOARD)
-gpio.setup(10, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(10, gpio.RISING, clallback=up)
-
-
-gpio.setwarnings(False)
-gpio.setmode(gpio.BOARD)
-gpio.setup(12, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(12, gpio.RISING, clallback=right)
-
-
-gpio.setwarnings(False)
-gpio.setmode(gpio.BOARD)
-gpio.setup(16, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(16, gpio.RISING, clallback=left)
-
+def gameOver(): #tehakse funktsioon gameOver
+  points = str(len(snake)-1) #Loetakse kokku saadud punktid
+  show_message(device, "POINTS: " + points, fill="red", scroll_delay=0.1  #LED-maatriksi ekraanile tulevad saaadud punktid
   
+  startPlace() #Käivitab funktsiooni startPlace
   
-def startPoint():
-  global snake, directions, food
-  snake = [4,4]
-  directions = [0,0]
-  while directions == [0,0]:
-    show_message(device, "START", fill="red", scroll_delay=0.1
-  foodSpawn()
-
-
-def gameOver():
-  points = str(len(snake)-1)
-  show_message(device, "POINTS: " + points, fill="red", scroll_delay=0.1
+startPlace() #Käivitab funktsiooni startPlace
   
-  startPoint()
-  
-startPoint()
+while True: #Loop mis kestab seni kuni on tõene
+  Pause = False #muutja Pause on väär
+  snakeNew = [snake[0][0]+directions[0], snake[0][1]+directions[1]] #Ussi liikumine
+  for index in snake: #Võetakse iga osa ussist
+    if(index == snakeNew): #kui uss puudutab oma saba
+      gameOver() #Käivitab funktsiooni gameOver
+      pass #Lõpetab loopi
 
+  if(snakeNew == food): #kui uss saab kätte toidu
+     foodSpawn() #Käivita funktsioon foodSpawn
+     Pause = True #muutja Puase on tõene
 
-def foodSpawn():
-  global food, snake
-  snakeFood = 0
-  x = randint(0, width)
-  y = randint(0, height)
-  while snakeFood == 0:
-    food = [x, y]
-    snakeFood = 1
-    for possision in snake:
-      if(possision == food):
-        foodSnake = 0
-  
-  
-while True:
-  Pause = False
-  snakeNew = [snake[0][0]+directions[0], snake[0][1]+directions[1]]
-  for index in snake:
-    if(index == snakeNew):
-      gameOver()
-      pass
+  else: #Kui ussi ei saa kätte toitu
+     snake.pop() #Eemaldb ühe osa ussist
+  snake.insert(0,snakeNew) #Lisab ühe osa ussile
 
-  if(snakeNew == food):
-     foodSpawn()
-     Pause = True
-
-  else:
-     snake.pop()
-  snake.insert(0,snakeNew)
-
-  if(snake[0][0] > width or snake[0][1]):
-    gameOver()
-    pass
-  elif(height or snake[0][0] < 0 or snake[0][1] < 0 ):
-    gameOver()
-    pass
+  if(snake[0][0] > width or snake[0][1]): #Kui uss üpuutub ise ennast
+    gameOver() #Käivitab funktsiooni gameOver
+    pass #Lõpetab loop
+  elif(height or snake[0][0] < 0 or snake[0][1] < 0 ): #Kui uss puudutab ennast
+    gameOver() #Käivitab funktsiooni gameOver
+    pass #Lõpetab loop
 
   
 with canvas(device) as draw:
-  for index in snake:
-    dither=True
-    draw.point(food, fill ="red")
-    draw.point(index, fill ="red")
+  for index in snake: #Võtab osa ussist
+    dither=True #muutja dither on tõene
+    draw.point(food, fill ="red") #paneb põlema vajaliku tule LED-maatriksil
+    draw.point(index, fill ="red") #paneb põlema vajaliku tule LED-maatriksil
 
-if(Pause == False):
-  lengthNew = (len(snake)-1)*0.1
-  time.sleep(0.3-lengthNew)
-else:
-  time.sleep(0.3)
+if(Pause == False): #Kui muutja Puase on väär
+  lengthNew = (len(snake)-1)*0.1 #Lisab ussile pikkust
+  time.sleep(0.3-lengthNew) #Ootab
+else: #Kui Puase ei ole väär
+  time.sleep(0.3) #ootab
