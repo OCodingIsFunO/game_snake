@@ -19,17 +19,17 @@ def down(gpio):
   
 def up(gpio):
   global directions
-  directions = [0,-1]#ülesse
+  directions = [0,-1] #ülesse
   
   
-def felt(gpio):
+def left(gpio):
   global directions
-  directions = [-1,0]#vasakule
+  directions = [-1,0] #vasakule
   
   
 def right(gpio):
   global directions
-  directions = [0,1]#paremale
+  directions = [0,1] #paremale
   
   
 gpio.setwarnings(False)
@@ -47,28 +47,28 @@ gpio.add_event_detect(10, gpio.RISING, clallback=up)
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
 gpio.setup(12, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(12, gpio.RISING, clallback=paremale)
+gpio.add_event_detect(12, gpio.RISING, clallback=right)
 
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
 gpio.setup(16, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(16, gpio.RISING, clallback=vasakule)
+gpio.add_event_detect(16, gpio.RISING, clallback=left)
 
   
   
- def startPoint():
+def startPoint():
   global snake, directions, food
   snake = [4,4]
   directions = [0,0]
   while directions == [0,0]:
-    show_message(device, "START", fill="red", scroll_delay=0.5)
+    show_message(device, "START", fill="red", scroll_delay=0.1
   foodSpawn()
 
 
 def gameOver():
   points = str(len(snake)-1)
-  show_message(device, "POINTS: " + points, fill="red", scroll_delay=0.5)
+  show_message(device, "POINTS: " + points, fill="red", scroll_delay=0.1
   
   startPoint()
   
@@ -112,14 +112,14 @@ while True:
     pass
 
   
-   with canvas(device) as draw:
-      for index in snake:
-        dither=True
-        draw.point(food, fill ="red")
-        draw.point(index, fill ="red")
+with canvas(device) as draw:
+  for index in snake:
+    dither=True
+    draw.point(food, fill ="red")
+    draw.point(index, fill ="red")
 
-  if(Pause == False):
-    lengthNew = (len(snake)-1)*0.1
-    time.sleep(0.3-lengthNew)
-  else:
-    time.sleep(0.3)
+if(Pause == False):
+  lengthNew = (len(snake)-1)*0.1
+  time.sleep(0.3-lengthNew)
+else:
+  time.sleep(0.3)
