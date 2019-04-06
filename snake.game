@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import random
+from random import randit
 import time
 import RPi.GPIO as gpio
 from luma.core.interface.serial import spi, noop
@@ -11,6 +11,9 @@ gpio.setmode(gpio.BOARD)
 
 serial = spi(port=0, device=0, gpio=noop())
 device = max7219(serial, height=8, width=8)
+width = 8
+height = 8
+
 
 def down(gpio):
   global directions
@@ -34,27 +37,27 @@ def right(gpio):
 
 gpio.setwarnings(False)
 gpio.setup(8, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(8, gpio.RISING, clallback=down)
+gpio.add_event_detect(8, gpio.RISING, callback=down)
 
 
 gpio.setwarnings(False)
 gpio.setup(10, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(10, gpio.RISING, clallback=up)
+gpio.add_event_detect(10, gpio.RISING, callback=up)
  
 
 gpio.setwarnings(False)
 gpio.setup(12, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(12, gpio.RISING, clallback=right)
+gpio.add_event_detect(12, gpio.RISING, callback=right)
 
 
 gpio.setwarnings(False)
 gpio.setup(16, gpio.IN, pull_up_down=gpio.PUD_DOWN)
-gpio.add_event_detect(16, gpio.RISING, clallback=left)
+gpio.add_event_detect(16, gpio.RISING, callback=left)
 
 
 def startPlace():
   global snake, directions, food
-  snake = [4,4]
+  snake = [[4,4]]
   directions = [0,0]
   while directions == [0,0]:
     show_message(device, "START", fill="red", scroll_delay=0.1)
@@ -74,10 +77,9 @@ def foodSpawn():
         foodSnake = False
   
   
-  def gameOver():
+def gameOver():
   points = len(snake)-1
   show_message(device, "POINTS: " + str(points), fill="red", scroll_delay=0.1
-  
   startPlace()
   
 startPlace()
