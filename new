@@ -33,7 +33,7 @@ for i in taster:
 
 def startSpiel():
   global snake, richtung, apfel
-  snake = [[randint(2,width-4),randint(3,height-3)]]
+  snake = [4,4]
   richtung = [0,0]
   while richtung == [0,0]:
     show_message(device, "READY", fill="white", scroll_delay=0.04)
@@ -44,7 +44,9 @@ def neuerApfel():
   apfelSnake = False
   while apfelSnake == False:
     apfelSnake = True
-    apfel = [randint(0,width),randint(0,height)]
+    x = randint(0,width)
+    y = randint(0,height)
+    apfel = [x,y]
     for i in snake:
       if(i == apfel):
         apfelSnake = False
