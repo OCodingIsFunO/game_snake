@@ -37,7 +37,7 @@ gpio.setup(8, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.add_event_detect(8, gpio.RISING, clallback=down)
 
 
-gpio.setwarnings(False) #lülitab välja hoiatused pinnil
+gpio.setwarnings(False)
 gpio.setup(10, gpio.IN, pull_up_down=gpio.PUD_DOWN)
 gpio.add_event_detect(10, gpio.RISING, clallback=up)
  
@@ -57,7 +57,7 @@ def startPlace():
   snake = [4,4]
   directions = [0,0]
   while directions == [0,0]:
-    show_message(device, "START", fill="red", scroll_delay=0.1
+    show_message(device, "START", fill="red", scroll_delay=0.1)
   foodSpawn()
 
                  
