@@ -53,12 +53,6 @@ def neuerApfel():
   print(apfel)
 
 def endOfGame():
-  for i in range(0,2):
-    device.clear()
-    for i in range(0,width+1):
-      for j in range(0,height+1):
-         time.sleep(0.001)
-    time.sleep(0.01)
   show_message(device, "GAME OVER", fill="white", scroll_delay=0.04)
   punkte = len(snake)-1
   show_message(device,"EREICHTE PUNKTE: "+ str(punkte), fill="white", scroll_delay=0.04)
@@ -92,9 +86,8 @@ while True:
 
   device.clear()
 
-  for i in snake:
-    with canvas(device) as draw:
-       dither=True
+  with canvas(device) as draw:
+     for i in snake:
        draw.point(apfel, fill ="white")
        draw.point(i, fill ="white")
 
